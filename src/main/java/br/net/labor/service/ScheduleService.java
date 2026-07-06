@@ -2,9 +2,11 @@ package br.net.labor.service;
 
 import br.net.labor.model.candidateApplication.ApplicationStatus;
 import br.net.labor.model.candidateApplication.CandidateApplication;
+import br.net.labor.model.dto.jobs.JobsVacanciesResponseWithCandidatesDTO;
 import br.net.labor.model.dto.jobs.JobsVacanciesResponseWithOutCandidatesDTO;
 import br.net.labor.model.dto.likeJobs.CandidateInJobDTO;
 import br.net.labor.model.dto.schedule.JobWithSelectedsResponseDTO;
+import br.net.labor.model.dto.schedule.ScheduleForCandidate;
 import br.net.labor.model.jobs.JobVacancies;
 import br.net.labor.model.schedule.Schedule;
 import br.net.labor.model.typeUser.Candidate;
@@ -83,14 +85,18 @@ public class ScheduleService {
         );
     }
 
-    public List<Schedule> findByCandidate(UUID id){
-
-        Candidate candidate = candidateRepository.findById(id)
-                .orElseThrow();
-
-        return scheduleRepository.findByCandidatesContaining(candidate);
-    }
-
+//    //precisa fazer DTO
+//    public List<ScheduleForCandidate> findByCandidate(UUID id){
+//
+//        Candidate candidate = candidateRepository.findById(id)
+//                .orElseThrow();
+//        return new ScheduleForCandidate(
+//                new JobsVacanciesResponseWithCandidatesDTO(
+//                        new JobsVacanciesResponseWithOutCandidatesDTO()
+//                )
+//        )
+//    }
+    //precisa fazer DTO
     public List<Schedule> findByJob(UUID id){
 
         JobVacancies job = jobVacanciesRepository.findById(id)

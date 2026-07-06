@@ -26,4 +26,14 @@ public class ScheduleController {
     public JobWithSelectedsResponseDTO generateSchedule(@PathVariable UUID id){
         return scheduleService.generateSchedule(id);
     }
+    //precisa fazer DTO
+//    @GetMapping("/candidate/{id}")
+//    public List<Schedule> findByCandidate(@PathVariable UUID id){
+//        return scheduleService.findByCandidate(id);
+//    }
+    //precisa fazer DTO
+    @GetMapping("/job/{id}")
+    public List<Schedule> findByJob(@PathVariable UUID id){
+        return scheduleService.findByJob(id);
+    }
 }

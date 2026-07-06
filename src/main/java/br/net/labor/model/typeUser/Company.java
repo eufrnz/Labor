@@ -1,5 +1,6 @@
 package br.net.labor.model.typeUser;
 
+import br.net.labor.model.chat.ChatModel;
 import br.net.labor.model.jobs.JobVacancies;
 import br.net.labor.model.schedule.Schedule;
 import br.net.labor.model.user.User;
@@ -30,6 +31,8 @@ public class Company {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    private List<ChatModel> chats = new ArrayList<>();
 
     public UUID getId() {
         return id;
@@ -109,5 +112,13 @@ public class Company {
 
     public void setSchedules(List<Schedule> schedules) {
         this.schedules = schedules;
+    }
+
+    public List<ChatModel> getChats() {
+        return chats;
+    }
+
+    public void setChats(List<ChatModel> chats) {
+        this.chats = chats;
     }
 }
