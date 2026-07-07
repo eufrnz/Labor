@@ -10,10 +10,8 @@ import br.net.labor.model.dto.schedule.ScheduleForCandidate;
 import br.net.labor.model.jobs.JobVacancies;
 import br.net.labor.model.schedule.Schedule;
 import br.net.labor.model.typeUser.Candidate;
-import br.net.labor.repository.ApplicationRepository;
-import br.net.labor.repository.CandidateRepository;
-import br.net.labor.repository.JobVacanciesRepository;
-import br.net.labor.repository.ScheduleRepository;
+import br.net.labor.model.typeUser.Company;
+import br.net.labor.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,12 +24,16 @@ public class ScheduleService {
     private final JobVacanciesRepository jobVacanciesRepository;
     private final ScheduleRepository scheduleRepository;
     private final CandidateRepository candidateRepository;
+    private final CompanyRepository companyRepository;
+    private final ChatService chatService;
 
-    public ScheduleService(ApplicationRepository applicationRepository, JobVacanciesRepository jobVacanciesRepository, ScheduleRepository scheduleRepository, CandidateRepository candidateRepository) {
+    public ScheduleService(ApplicationRepository applicationRepository, JobVacanciesRepository jobVacanciesRepository, ScheduleRepository scheduleRepository, CandidateRepository candidateRepository, CompanyRepository companyRepository, ChatService chatService) {
         this.applicationRepository = applicationRepository;
         this.jobVacanciesRepository = jobVacanciesRepository;
         this.scheduleRepository = scheduleRepository;
         this.candidateRepository = candidateRepository;
+        this.companyRepository = companyRepository;
+        this.chatService = chatService;
     }
 
     public JobWithSelectedsResponseDTO generateSchedule(UUID id){
@@ -52,6 +54,17 @@ public class ScheduleService {
                         }
                 ).toList();
         scheduleRepository.saveAll(schedules);
+        Candidate candidate = new Candidate();
+        candidate.setSchedules(schedules);
+        candidateRepository.save(candidate);
+        Company company = new Company();
+        company.setSchedules(schedules);
+        companyRepository.save(company);
+        selected.forEach(application ->
+                        chatService.generateChat(
+                                application.getCandidate().getUser().getEmail()
+                        )
+                );
 
 
         List<CandidateInJobDTO> candidates = selected.stream()
