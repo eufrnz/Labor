@@ -1,5 +1,6 @@
 package br.net.labor.model.chat;
 
+import br.net.labor.model.user.User;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -22,6 +23,9 @@ public class Message {
 
     @Column(nullable = false)
     private LocalDateTime sentAt;
+    @ManyToOne
+    @JoinColumn(name = "sender_id", nullable = false)
+    private User sender;
 
     public UUID getId() {
         return id;
@@ -53,5 +57,13 @@ public class Message {
 
     public void setSentAt(LocalDateTime sentAt) {
         this.sentAt = sentAt;
+    }
+
+    public User getSender() {
+        return sender;
+    }
+
+    public void setSender(User sender) {
+        this.sender = sender;
     }
 }
