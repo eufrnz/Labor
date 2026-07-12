@@ -26,13 +26,12 @@ public class CandidateInJobService {
         this.applicationRepository = applicationRepository;
     }
 
-    public LikeInJobsResponseDTO likeJobs(String email, UUID id){
+    public LikeInJobsResponseDTO likeJobs(String email, UUID id) {
         Candidate candidate = candidateRepository.findByUserEmail(email)
                 .orElseThrow(() -> new RuntimeException("Candidate not found"));
         JobVacancies jobVacancies = jobVacanciesRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vacancy not found"));
-        CandidateApplication application =
-                new CandidateApplication();
+        CandidateApplication application = new CandidateApplication();
 
         application.setCandidate(candidate);
         application.setJob(jobVacancies);

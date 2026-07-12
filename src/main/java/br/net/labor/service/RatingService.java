@@ -33,7 +33,7 @@ public class RatingService {
         this.userRepository = userRepository;
     }
 
-    public RatingResponseDTO ratingCompany(RateRequestDTO rateRequestDTO, String email, UUID idUser){
+    public RatingResponseDTO ratingCompany(RateRequestDTO rateRequestDTO, String email, UUID idUser) {
         User user = userRepository.findById(idUser)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         User userLogged = userRepository.findByEmail(email)
@@ -43,12 +43,12 @@ public class RatingService {
         rating.setRating(rateRequestDTO.rating());
         rating.setRatingDescription(rateRequestDTO.ratingDescription());
 
-        //avaliando empresa
+        //candidate rating company
         if (userLogged.getRole() == RolesEnumType.ROLE_CANDIDATE) {
-            if (userLogged.getId() == user.getId()){
+            if (userLogged.getId() == user.getId()) {
                 throw new RuntimeException("You cannot self evaluate");
             }
-            if(userLogged.getRole() == user.getRole()){
+            if (userLogged.getRole() == user.getRole()) {
                 throw new RuntimeException("You cannot rate a candidate");
             }
             Candidate candidate = candidateRepository.findByUserEmail(email)
@@ -65,12 +65,12 @@ public class RatingService {
                     user.getUsername()
             );
         }
-        //avaliando candidato
-        if (userLogged.getRole()  == RolesEnumType.ROLE_COMPANY) {
-            if (userLogged.getId() == user.getId()){
+        //company ranting candidate
+        if (userLogged.getRole() == RolesEnumType.ROLE_COMPANY) {
+            if (userLogged.getId() == user.getId()) {
                 throw new RuntimeException("You cannot self evaluate");
             }
-            if(userLogged.getRole() == user.getRole()){
+            if (userLogged.getRole() == user.getRole()) {
                 throw new RuntimeException("You cannot rate a company");
             }
             Company company = companyRepository.findByUserEmail(email)
@@ -90,15 +90,15 @@ public class RatingService {
         throw new RuntimeException("Invalid role.");
     }
 
-    public List<RatingResponseDTO> getAll () {
-            return ratingRepository.findAll().stream()
-                    .map(rating -> new RatingResponseDTO(
-                            rating.getId(),
-                            rating.getRating(),
-                            rating.getRatingDescription(),
-                            rating.getSentBy(),
-                            rating.getUser().getUsername()
-                    )).toList();
-        }
+    public List<RatingResponseDTO> getAll() {
+        return ratingRepository.findAll().stream()
+                .map(rating -> new RatingResponseDTO(
+                        rating.getId(),
+                        rating.getRating(),
+                        rating.getRatingDescription(),
+                        rating.getSentBy(),
+                        rating.getUser().getUsername()
+                )).toList();
+    }
 
 }

@@ -1,0 +1,168 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Chats</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+        .container { display: flex; height: 100vh; }
+        .list { width: 300px; border-right: 1px solid #ddd; overflow-y: auto; }
+        .list ul { list-style: none; padding: 0; margin: 0; }
+        .list li { padding: 12px; border-bottom: 1px solid #eee; cursor: pointer; }
+        .list li:hover { background: #f5f5f5; }
+        .chat { flex: 1; display: flex; flex-direction: column; }
+        .messages { flex: 1; padding: 12px; overflow-y: auto; }
+        .message { margin-bottom: 8px; }
+        .message.me { text-align: right; }
+        .composer { padding: 12px; border-top: 1px solid #ddd; display:flex; gap:8px; }
+        .composer input[type="text"] { flex: 1; padding: 8px; }
+        .composer button { padding: 8px 12px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="list">
+        <h3 style="margin:8px">Conversas</h3>
+        <ul id="chatList"></ul>
+    </div>
+
+    <div class="chat">
+        <div style="padding:8px;border-bottom:1px solid #eee">
+            <strong id="chatTitle">Selecione uma conversa</strong>
+        </div>
+        <div id="messages" class="messages"></div>
+
+        <div class="composer">
+            <input id="messageInput" type="text" placeholder="Escreva uma mensagem..." />
+            <button id="sendBtn">Enviar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Variables injected by Thymeleaf -->
+<div id="userInfo" th:attr="data-user-id=${userId},data-user-email=${userEmail}" style="display:none"></div>
+
+<!-- SockJS + StompJS (CDN) -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+<script th:inline="javascript">
+/*<![CDATA[*/
+const userId = /*[[${userId}]]*/ '';
+const userEmail = /*[[${userEmail}]]*/ '';
+/*]]>*/
+</script>
+
+<script>
+    let stompClient = null;
+    let currentChatId = null;
+
+    function connectStomp() {
+        const socket = new SockJS('/chat');
+        stompClient = Stomp.over(socket);
+        stompClient.debug = null;
+        stompClient.connect({}, function(frame) {
+            console.log('Connected: ' + frame);
+        }, function(err){
+            console.warn('STOMP error', err);
+        });
+    }
+
+    async function loadChats(){
+        if (!userId) return;
+        const res = await fetch('/api/chat/user/' + userId);
+        if (!res.ok) { console.error('failed loading chats'); return; }
+        const chats = await res.json();
+        const ul = document.getElementById('chatList');
+        ul.innerHTML = '';
+        chats.forEach(chat => {
+            const li = document.createElement('li');
+            const name = (chat.candidate && chat.candidate.name) ? chat.candidate.name : (chat.company && chat.company.name) ? chat.company.name : 'Contato';
+            li.textContent = name;
+            li.dataset.chatId = chat.chatId;
+            li.addEventListener('click', () => openChat(chat.chatId, name));
+            ul.appendChild(li);
+        });
+    }
+
+    async function openChat(chatId, title){
+        currentChatId = chatId;
+        document.getElementById('chatTitle').textContent = title;
+        document.getElementById('messages').innerHTML = '';
+
+        // subscribe to topic
+        if (stompClient) {
+            // unsubscribe previous subscriptions by reconnecting for simplicity
+            try { stompClient.disconnect(() => {}); } catch(e){}
+            connectStomp();
+        } else {
+            connectStomp();
+        }
+
+        // after a short delay subscribe
+        setTimeout(() => {
+            stompClient.subscribe('/topic/chat/' + chatId, function(message){
+                const payload = JSON.parse(message.body);
+                appendMessage(payload);
+            });
+        }, 300);
+
+        // load history
+        const res = await fetch('/api/messages/' + chatId);
+        if (res.ok){
+            const messages = await res.json();
+            messages.forEach(m => appendMessage(m));
+        }
+    }
+
+    function appendMessage(m){
+        const container = document.getElementById('messages');
+        const div = document.createElement('div');
+        div.className = 'message ' + (m.sender && m.sender.id === userId ? 'me' : '');
+        const who = document.createElement('div');
+        who.style.fontSize='12px'; who.style.color='#666';
+        who.textContent = (m.sender && m.sender.name) ? m.sender.name : (m.sender && m.sender.email) ? m.sender.email : '';
+        const content = document.createElement('div');
+        content.textContent = m.content;
+        div.appendChild(who);
+        div.appendChild(content);
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
+    }
+
+    document.getElementById('sendBtn').addEventListener('click', sendMessage);
+    document.getElementById('messageInput').addEventListener('keypress', function(e){ if (e.key === 'Enter') sendMessage(); });
+
+    function sendMessage(){
+        const input = document.getElementById('messageInput');
+        const text = input.value.trim();
+        if (!text || !currentChatId) return;
+        const payload = {
+            chatId: currentChatId,
+            senderId: userId,
+            content: text
+        };
+
+        // send via stomp
+        if (stompClient && stompClient.connected) {
+            stompClient.send('/app/chat/send', {}, JSON.stringify(payload));
+            input.value = '';
+        } else {
+            // fallback: POST to message endpoint if available
+            fetch('/api/messages/' + currentChatId, {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify(payload)
+            }).then(r => { if (r.ok) input.value = ''; });
+        }
+    }
+
+    // init
+    document.addEventListener('DOMContentLoaded', function(){
+        loadChats();
+    });
+</script>
+
+</body>
+</html>
+

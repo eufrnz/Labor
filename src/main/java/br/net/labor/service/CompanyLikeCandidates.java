@@ -44,9 +44,9 @@ public class CompanyLikeCandidates {
         List<CandidateInJobDTO> result = new ArrayList<>();
 
         List<JobVacancies> jobs = jobVacanciesRepository.findAll();
-        for(JobVacancies jobVacancies: jobs){
-            for (CandidateApplication application : jobVacancies.getApplications()){
-                if(application.getStatus() == ApplicationStatus.SELECTED){
+        for (JobVacancies jobVacancies : jobs) {
+            for (CandidateApplication application : jobVacancies.getApplications()) {
+                if (application.getStatus() == ApplicationStatus.SELECTED) {
                     result.add(
                             new CandidateInJobDTO(
                                     application.getCandidate().getId(),

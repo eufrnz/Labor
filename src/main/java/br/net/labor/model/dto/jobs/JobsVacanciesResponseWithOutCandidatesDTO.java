@@ -1,5 +1,6 @@
 package br.net.labor.model.dto.jobs;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
@@ -12,7 +13,7 @@ public record JobsVacanciesResponseWithOutCandidatesDTO(
                                        Double payValue,
                                        LocalTime initTime,
                                        LocalTime endTime,
-                                       Date dateJob,
+                                       LocalDate dateJob,
                                        String description,
                                        String companyName
 ) {

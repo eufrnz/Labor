@@ -1,7 +1,9 @@
 package br.net.labor.model.typeUser;
 
 import br.net.labor.model.candidateApplication.CandidateApplication;
+import br.net.labor.model.chat.ChatModel;
 import br.net.labor.model.jobs.JobVacancies;
+import br.net.labor.model.schedule.Schedule;
 import br.net.labor.model.user.User;
 import jakarta.persistence.*;
 
@@ -26,6 +28,26 @@ public class Candidate {
     private String realName;
     @OneToMany(mappedBy = "candidate")
     private List<CandidateApplication> applications = new ArrayList<>();
+    @ManyToMany(mappedBy = "candidates")
+    private List<Schedule> schedules = new ArrayList<>();
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL)
+    private List<ChatModel> chats = new ArrayList<>();
+
+    public List<Schedule> getSchedules() {
+        return schedules;
+    }
+
+    public void setSchedules(List<Schedule> schedules) {
+        this.schedules = schedules;
+    }
+
+    public List<ChatModel> getChats() {
+        return chats;
+    }
+
+    public void setChats(List<ChatModel> chats) {
+        this.chats = chats;
+    }
 
     public List<CandidateApplication> getApplications() {
         return applications;

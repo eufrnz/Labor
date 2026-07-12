@@ -1,6 +1,8 @@
 package br.net.labor.model.typeUser;
 
+import br.net.labor.model.chat.ChatModel;
 import br.net.labor.model.jobs.JobVacancies;
+import br.net.labor.model.schedule.Schedule;
 import br.net.labor.model.user.User;
 import jakarta.persistence.*;
 
@@ -24,11 +26,13 @@ public class Company {
     private String status;
     @OneToMany(mappedBy = "company")
     private List<JobVacancies> jobVacancies = new ArrayList<>();
-
-
+    @OneToMany(mappedBy = "company")
+    private List<Schedule> schedules = new ArrayList<>();
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+    @OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
+    private List<ChatModel> chats = new ArrayList<>();
 
     public UUID getId() {
         return id;
@@ -100,5 +104,21 @@ public class Company {
 
     public void setJobVacancies(List<JobVacancies> jobVacancies) {
         this.jobVacancies = jobVacancies;
+    }
+
+    public List<Schedule> getSchedules() {
+        return schedules;
+    }
+
+    public void setSchedules(List<Schedule> schedules) {
+        this.schedules = schedules;
+    }
+
+    public List<ChatModel> getChats() {
+        return chats;
+    }
+
+    public void setChats(List<ChatModel> chats) {
+        this.chats = chats;
     }
 }
