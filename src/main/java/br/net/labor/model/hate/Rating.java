@@ -1,6 +1,5 @@
 package br.net.labor.model.hate;
 
-import br.net.labor.model.typeUser.Candidate;
 import br.net.labor.model.user.User;
 import jakarta.persistence.*;
 

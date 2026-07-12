@@ -1,8 +1,8 @@
 package br.net.labor.controller;
 
 import br.net.labor.model.dto.jobs.JobsVacanciesRequestDTO;
-import br.net.labor.model.dto.jobs.JobsVacanciesResponseDTO;
-import br.net.labor.model.jobs.JobVacancies;
+import br.net.labor.model.dto.jobs.JobsVacanciesResponseWithCandidatesDTO;
+import br.net.labor.model.dto.jobs.JobsVacanciesResponseWithOutCandidatesDTO;
 import br.net.labor.service.JobVacanciesService;
 
 import org.springframework.http.HttpStatus;
@@ -25,20 +25,20 @@ public class JobsVacanciesController {
     }
 
     @PostMapping
-    public ResponseEntity<JobsVacanciesResponseDTO> createJobs(@AuthenticationPrincipal JWTUserData userData, @RequestBody JobsVacanciesRequestDTO jobsVacanciesRequestDTO){
+    public ResponseEntity<JobsVacanciesResponseWithOutCandidatesDTO> createJobs(@AuthenticationPrincipal JWTUserData userData, @RequestBody JobsVacanciesRequestDTO jobsVacanciesRequestDTO){
         if (userData == null) {
             throw new RuntimeException("Usuário não autenticado");
         }
 
         String emailFromLoggeduser = userData.email();
 
-        JobsVacanciesResponseDTO response = jobVacanciesService.createJobsVacancies(jobsVacanciesRequestDTO, emailFromLoggeduser);
+        JobsVacanciesResponseWithOutCandidatesDTO response = jobVacanciesService.createJobsVacancies(jobsVacanciesRequestDTO, emailFromLoggeduser);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
-    public List<JobsVacanciesResponseDTO> getAll(){
+    public List<JobsVacanciesResponseWithCandidatesDTO> getAll(){
         return jobVacanciesService.getAll();
     }
 

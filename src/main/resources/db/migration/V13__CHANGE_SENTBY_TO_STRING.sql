@@ -1,8 +1,0 @@
-ALTER TABLE ratings
-DROP CONSTRAINT IF EXISTS fk_rating_sent_by;
-
-ALTER TABLE ratings
-DROP COLUMN IF EXISTS send_by_id;
-
-ALTER TABLE ratings
-    ADD COLUMN sent_by VARCHAR(255);

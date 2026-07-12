@@ -42,7 +42,7 @@ public class AuthService {
         this.companyRepository = companyRepository;
     }
 
-    public LoginResponse login(LoginRequest loginRequest){
+    public LoginResponse login(LoginRequest loginRequest) {
         var authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.email(),
@@ -54,8 +54,8 @@ public class AuthService {
         return new LoginResponse(user.getEmail(), token);
     }
 
-    public CompanyResponseDTO registerCompany(CompanyRequestDTO companyRequestDTO){
-        if(userRepository.findByEmail(companyRequestDTO.email()).isPresent()){
+    public CompanyResponseDTO registerCompany(CompanyRequestDTO companyRequestDTO) {
+        if (userRepository.findByEmail(companyRequestDTO.email()).isPresent()) {
             throw new RuntimeException("Email already exists");
         }
         User user = new User();
@@ -85,8 +85,8 @@ public class AuthService {
         );
     }
 
-    public CandidateResponse registerCandidate(CandidateRequest candidateRequest){
-        if(userRepository.findByEmail(candidateRequest.email()).isPresent()){
+    public CandidateResponse registerCandidate(CandidateRequest candidateRequest) {
+        if (userRepository.findByEmail(candidateRequest.email()).isPresent()) {
             throw new RuntimeException("Email already exists");
         }
 
@@ -116,15 +116,13 @@ public class AuthService {
     }
 
 
-    public void cadAdm(){
-       User user = new User();
-       user.setEmail("adm@gmail.com");
-       user.setPassword(passwordEncoder.encode("admin123"));
-       user.setRole(RolesEnumType.ROLE_ADMIN);
-       userRepository.save(user);
+    public void cadAdm() {
+        User user = new User();
+        user.setEmail("adm@gmail.com");
+        user.setPassword(passwordEncoder.encode("admin123"));
+        user.setRole(RolesEnumType.ROLE_ADMIN);
+        userRepository.save(user);
     }
-    
-
 
 
 }

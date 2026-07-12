@@ -1,10 +1,13 @@
 package br.net.labor.model.jobs;
 
+import br.net.labor.model.candidateApplication.CandidateApplication;
+import br.net.labor.model.schedule.Schedule;
 import br.net.labor.model.typeUser.Candidate;
 import br.net.labor.model.typeUser.Company;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -24,38 +27,23 @@ public class JobVacancies {
     private Double payValue;
     private LocalTime initTime;
     private LocalTime endTime;
-    private Date dateJob;
+    private LocalDate dateJob;
     private String description;
-    @OneToMany(mappedBy = "jobVacancies")
-    @JsonIgnoreProperties("jobVacancies")
-    private List<Candidate> candidates;
+    @OneToMany(mappedBy = "job")
+    private List<CandidateApplication> applications = new ArrayList<>();
     @ManyToOne
     @JoinColumn(name = "company_id")
     @JsonIgnoreProperties("jobVacancies")
     private Company company;
+    @OneToMany(mappedBy = "job")
+    private List<Schedule> schedules = new ArrayList<>();
 
-    public void addCandidate(Candidate candidate) {
-        if (this.candidates == null) {
-            this.candidates = new ArrayList<>();
-        }
-        this.candidates.add(candidate);
-        candidate.setJobVacancies(this);
+    public List<CandidateApplication> getApplications() {
+        return applications;
     }
 
-    public void removeCandidate(Candidate candidate){
-        if(this.candidates != null){
-            this.candidates.remove(candidate);
-            candidate.setJobVacancies(null);
-        }
-
-    }
-
-    public List<Candidate> getCandidates() {
-        return candidates;
-    }
-
-    public void setCandidates(List<Candidate> candidates) {
-        this.candidates = candidates;
+    public void setApplications(List<CandidateApplication> applications) {
+        this.applications = applications;
     }
 
     public Company getCompany() {
@@ -114,11 +102,11 @@ public class JobVacancies {
         this.endTime = endTime;
     }
 
-    public Date getDateJob() {
+    public LocalDate getDateJob() {
         return dateJob;
     }
 
-    public void setDateJob(Date dateJob) {
+    public void setDateJob(LocalDate dateJob) {
         this.dateJob = dateJob;
     }
 
@@ -128,5 +116,13 @@ public class JobVacancies {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<Schedule> getSchedules() {
+        return schedules;
+    }
+
+    public void setSchedules(List<Schedule> schedules) {
+        this.schedules = schedules;
     }
 }

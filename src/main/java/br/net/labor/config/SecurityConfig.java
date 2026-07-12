@@ -38,6 +38,8 @@ private final SecurityFilter securityFilter;
                         .requestMatchers("/api/likeInJobs/**").hasAnyRole("CANDIDATE","ADMIN")
                         .requestMatchers("/api/company/**").hasAnyRole("COMPANY","ADMIN")
                         .requestMatchers("/api/rating/**").hasAnyRole("COMPANY","ADMIN", "CANDIDATE")
+                        .requestMatchers("/api/likeInCandidates/**").hasAnyRole("COMPANY","ADMIN")
+                        .requestMatchers("/api/schedule/**").hasAnyRole("COMPANY","CANDIDATE", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
