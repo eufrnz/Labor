@@ -5,9 +5,11 @@ import br.net.labor.model.dto.jobs.JobsVacanciesResponseWithCandidatesDTO;
 import br.net.labor.model.dto.jobs.JobsVacanciesResponseWithOutCandidatesDTO;
 import br.net.labor.model.dto.likeJobs.CandidateInJobDTO;
 import br.net.labor.model.jobs.JobVacancies;
+import br.net.labor.model.schedule.Schedule;
 import br.net.labor.model.typeUser.Company;
 import br.net.labor.repository.CompanyRepository;
 import br.net.labor.repository.JobVacanciesRepository;
+import br.net.labor.repository.ScheduleRepository;
 import org.jspecify.annotations.NonNull;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -22,10 +24,12 @@ public class JobVacanciesService {
 
     private final JobVacanciesRepository jobVacanciesRepository;
     private final CompanyRepository companyRepository;
+    private final ScheduleRepository scheduleRepository;
 
-    public JobVacanciesService(JobVacanciesRepository jobVacanciesRepository, CompanyRepository companyRepository) {
+    public JobVacanciesService(JobVacanciesRepository jobVacanciesRepository, CompanyRepository companyRepository, ScheduleRepository scheduleRepository) {
         this.jobVacanciesRepository = jobVacanciesRepository;
         this.companyRepository = companyRepository;
+        this.scheduleRepository = scheduleRepository;
     }
 
     public JobsVacanciesResponseWithOutCandidatesDTO createJobsVacancies(JobsVacanciesRequestDTO jobsVacanciesRequestDTO, String email) {
@@ -117,11 +121,11 @@ public class JobVacanciesService {
         List<JobVacancies> jobVacancies = jobVacanciesRepository.findAll();
 
         for (JobVacancies vacancy : jobVacancies) {
-            LocalTime jobFinishedEndTime = vacancy.getEndTime();
             LocalTime currentHour = LocalTime.now();
             LocalDate currentDay = LocalDate.now();
-            LocalDate jobDay = vacancy.getDateJob();
-            if (!jobFinishedEndTime.isAfter(currentHour) && !jobDay.isAfter(currentDay)) {
+            if (!vacancy.getEndTime().isAfter(currentHour) && !vacancy.getDateJob().isAfter(currentDay)) {
+                List<Schedule> schedules = scheduleRepository.findByJob(vacancy);
+                scheduleRepository.deleteAll(schedules);
                 jobVacanciesRepository.delete(vacancy);
             }
         }
