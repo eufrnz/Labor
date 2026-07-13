@@ -33,6 +33,10 @@ public class CompanyLikeCandidates {
     public String likeCandidate(UUID idApplication) {
         CandidateApplication application = applicationRepository.findById(idApplication)
                 .orElseThrow(() -> new RuntimeException("Application not found"));
+        if(application.getStatus() == ApplicationStatus.SELECTED){
+            application.setStatus(ApplicationStatus.REJECTED);
+            applicationRepository.save(application);
+        }
         application.setStatus(ApplicationStatus.SELECTED);
         applicationRepository.save(application);
 
