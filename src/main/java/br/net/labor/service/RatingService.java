@@ -45,7 +45,7 @@ public class RatingService {
 
         //candidate rating company
         if (userLogged.getRole() == RolesEnumType.ROLE_CANDIDATE) {
-            if (userLogged.getId() == user.getId()) {
+            if (userLogged.getId().equals(user.getId())) {
                 throw new RuntimeException("You cannot self evaluate");
             }
             if (userLogged.getRole() == user.getRole()) {
@@ -53,6 +53,10 @@ public class RatingService {
             }
             Candidate candidate = candidateRepository.findByUserEmail(email)
                     .orElseThrow(() -> new RuntimeException("Candidate not found"));
+            boolean alreadyRated = user.getRating().stream().anyMatch(r -> r.getSentBy().equals(candidate.getUsername()));
+            if(alreadyRated){
+                throw new RuntimeException("You have already rated this company");
+            }
             rating.setUser(user);
             rating.setSentBy(candidate.getUsername());
             userRepository.save(user);
@@ -75,6 +79,10 @@ public class RatingService {
             }
             Company company = companyRepository.findByUserEmail(email)
                     .orElseThrow(() -> new RuntimeException("company not found"));
+            boolean alreadyRatedCompany = user.getRating().stream().anyMatch(r -> r.getSentBy().equals(company.getCompanyName()));
+            if(alreadyRatedCompany){
+                throw new RuntimeException("You have already rated this candidate");
+            }
             rating.setUser(user);
             rating.setSentBy(company.getCompanyName());
             userRepository.save(user);
