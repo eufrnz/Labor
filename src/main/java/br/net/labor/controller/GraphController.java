@@ -30,8 +30,8 @@ public class GraphController {
         if(userData == null){
             throw new RuntimeException("User not logged");
         }
-        String emailFromLoggeduser = userData.email();
-        return ResponseEntity.ok(graphService.calculateEnterpriseExpenses(emailFromLoggeduser));
+        String emailFromLoggedUser = userData.email();
+        return ResponseEntity.ok(graphService.calculateEnterpriseExpenses(emailFromLoggedUser));
     }
 
     @GetMapping("/count-jobs")
@@ -39,7 +39,7 @@ public class GraphController {
         if(userData == null){
             throw new RuntimeException("User not logged");
         }
-        String emailFromLoggeduser = userData.email();
-        return ResponseEntity.ok(graphService.countJobs(emailFromLoggeduser));
+        String emailFromLoggedUser = userData.email();
+        return ResponseEntity.ok(graphService.countJobs(emailFromLoggedUser));
     }
 }
