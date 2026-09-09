@@ -2,6 +2,7 @@ package br.net.labor.repository;
 
 import br.net.labor.model.candidateApplication.ApplicationStatus;
 import br.net.labor.model.candidateApplication.CandidateApplication;
+import br.net.labor.model.dto.jobs.JobsVacanciesResponseWithCandidatesDTO;
 import br.net.labor.model.jobs.JobVacancies;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,4 +16,7 @@ public interface ApplicationRepository extends JpaRepository<CandidateApplicatio
             JobVacancies job,
             ApplicationStatus status
     );
+    long countByJobIdAndStatus(UUID jobId, ApplicationStatus status);
+    long countByJobAndStatus(JobVacancies jobVacancies, ApplicationStatus status);
+
 }
